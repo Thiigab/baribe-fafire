@@ -104,12 +104,14 @@ class Game:
         self.trashes = []
 
         for i in range(10):
-
             x = random.randint(50, WIDTH - 50)
-
             trash = Trash(x, self.floor)
-
             self.trashes.append(trash)
+
+# --- Trash respawn ---
+        self.trash_respawn_delay = 5000  # 5 segundos após limpar tudo
+        self.trash_respawn_timer = None  # None = não está contando
+        self.trash_amount = 10           # quantos lixos spawnar no respawn
 
         self.seaweed_img = pygame.image.load("assets/sprites/objetcs/coral_1.png").convert_alpha()
         # No __init__, substitui o bloco das seaweeds:
@@ -132,6 +134,7 @@ class Game:
                     for trash in self.trashes:
                         if trash.try_collect(self.player):
                             self.score += 1
+                            break
 
     # ----------------------
     # BUBBLE SPAWN
@@ -200,11 +203,36 @@ class Game:
             self.last_player_bubble = now
 
     # ----------------------
+    # TRASH RESPAWN
+    # ----------------------
+    def check_trash_respawn(self):
+        now = pygame.time.get_ticks()
+
+        todos_coletados = all(t.coletado for t in self.trashes)
+
+        if todos_coletados and self.trash_respawn_timer is None:
+            self.trash_respawn_timer = now
+
+        if self.trash_respawn_timer and now - self.trash_respawn_timer >= self.trash_respawn_delay:
+            self.trashes = []
+            for _ in range(self.trash_amount):
+                x = random.randint(50, WIDTH - 50)
+                self.trashes.append(Trash(x, self.floor))
+            self.trash_respawn_timer = None
+
+    # ----------------------
+    # UPDATE
+    # ----------------------
+    def update(self, dt):
+        ...
+
+    # ----------------------
     # UPDATE
     # ----------------------
     def update(self, dt):
 
         self.player.move()
+        self.check_trash_respawn()
         self.spawn_oxygen_bubbles()
         self.update_oxygen_bubbles()
         self.check_oxygen_collision()

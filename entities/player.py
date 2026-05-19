@@ -30,6 +30,11 @@ class Player:
             for i in range(0, 12)  # idle_1 até idle_14
         ]
 
+        self.idle_flip_frames = [
+            pygame.transform.flip(frame, False, True)
+            for frame in self.idle_frames
+        ]
+
         # --- Controle de animação ---
         self.current_frames = self.idle_frames
         self.frame_index = 0
@@ -71,14 +76,19 @@ class Player:
 
         # --- Troca animação ---
         # DEPOIS
-        if self.moving:
+        # --- Troca animação ---
+        if keys[pygame.K_a] or keys[pygame.K_d]:
             if self.current_frames != self.walk_frames:
                 self.current_frames = self.walk_frames
-                self.frame_index = 0  # reseta o índice ao trocar animação
+                self.frame_index = 0
+        elif keys[pygame.K_s]:
+            if self.current_frames != self.idle_flip_frames:
+                self.current_frames = self.idle_flip_frames
+                self.frame_index = 0
         else:
             if self.current_frames != self.idle_frames:
                 self.current_frames = self.idle_frames
-                self.frame_index = 0  # reseta o índice ao trocar animação
+                self.frame_index = 0
 
     def update_oxygen(self, dt):
         self.oxygen -= self.oxygen_drain_rate * dt

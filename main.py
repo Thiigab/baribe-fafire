@@ -1,5 +1,15 @@
+import pygame
+from menu import Menu
 from game import Game
 
-jogo = Game()
+pygame.init()
+screen = pygame.display.set_mode((1366, 768))
 
-jogo.run()
+menu = Menu(screen)
+action = menu.run()
+
+if action == "play":
+    jogo = Game()
+    jogo.run()
+
+pygame.quit()
